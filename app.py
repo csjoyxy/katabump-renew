@@ -399,10 +399,10 @@ def _goto_server_detail(sb) -> bool:
     time.sleep(5)
 
     # 检查页面顶部是否已有"还无法续期"全局提示
+    # 非窗口日：静默退出，不发任何通知（用户 2026-11-20 定：只在窗口日跑、只在窗口日报结果）
     alert_text = _read_alert(sb)
     if alert_text and "can't renew" in alert_text.lower():
-        print(f"ℹ️  页面顶部提示: {alert_text}")
-        send_notify("ℹ️", "⚠️ 未到续期时间", alert_text)
+        print(f"ℹ️  非窗口日，未到续期时间，静默退出不通知: {alert_text}")
         return False
 
     # 多种选择器尝试查找 See 链接
@@ -624,7 +624,8 @@ def _check_renew_result(sb):
         print(f"📩 页面提示: {alert_text}")
         low = alert_text.lower()
         if "can't renew" in low or "unable" in low:
-            send_notify("⏳", "未到续期时间", alert_text)
+            # 非窗口日：静默退出，不发任何通知（用户 2026-11-20 定）
+            print("ℹ️  非窗口日，未到续期时间，静默退出不通知")
         elif any(kw in low for kw in ( "renewed", "success", "extended")):
             send_notify("✅", "续期成功", alert_text)
         else:
